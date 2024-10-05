@@ -17,9 +17,9 @@ function returnGameBoardVertices(minX, minY, maxX, maxY) {
         minY, maxY);
     gameBoardVertices = gameBoardVertices.concat(returnVerticalLineVertices(minX + 2 * xSectionSize,
         minY, maxY));
-    gameBoardVertices = gameBoardVertices.concat(returnHorizontalVertices(minY + 2 * ySectionSize,
-        minX, maxX));
     gameBoardVertices = gameBoardVertices.concat(returnHorizontalVertices(minY + ySectionSize,
+        minX, maxX));
+    gameBoardVertices = gameBoardVertices.concat(returnHorizontalVertices(minY + 2 * ySectionSize,
         minX, maxX));
     return gameBoardVertices;
 }
@@ -36,7 +36,7 @@ function returnVerticalLineVertices(xValue, minY, maxY) {
     var height = maxY - minY;
     var lineVerticesPoints = [xValue, minY];
     for (i=0; i < height; i++)
-        lineVerticesPoints.push(xValue, minY + i);
+        lineVerticesPoints.push(xValue, minY + i,   xValue + 1, minY + i);
     return lineVerticesPoints;
 }
 
@@ -45,12 +45,13 @@ function returnVerticalLineVertices(xValue, minY, maxY) {
  * @param {*} yValue Y value of the entire line
  * @param {*} minX Minimum X value or start of the line
  * @param {*} maxX Maximum X value or end of the line
- * @returns 
+ * @returns lineVerticesPoints The vertices for drawing a 
+ * horizontal line with points
  */
 function returnHorizontalVertices(yValue, minX, maxX) {
     var width = maxX - minX;
     var lineVerticesPoints = [yValue, minX];
     for (i=0; i < width; i++)
-        lineVerticesPoints.push(minX + i, yValue);
+        lineVerticesPoints.push(minX + i, yValue,   minX + i, yValue + 1);
     return lineVerticesPoints;
 }

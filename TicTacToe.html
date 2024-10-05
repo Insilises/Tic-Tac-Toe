@@ -32,6 +32,7 @@ by two players. Entirely drawn with points.
     <script type = "text/javascript" src = "initShaders.js"></script>
     <script type = "text/javascript" src = "webgl-utils.js"></script>
     <script type = "text/javascript" src = "gameBoard.js"></script>
+    <script type = "text/javascript" src = "XPiece.js"></script>
 
     <script type = "text/javascript">
         var canvas;
@@ -69,6 +70,19 @@ by two players. Entirely drawn with points.
             //Actual drawing
             gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
             gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
+
+            //TODO: Remove later; this is just to test before trying inputs
+            //Drawing a line for the X Piece
+            var lineVertices = returnVerticesLineNegSmallSlope(-800, -267, 267, 800); //Drawing in top left square?
+            for (i=0; i < lineVertices.length; i++) {
+                lineVertices[i] = lineVertices[i]/1000.0;
+            }
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineVertices), gl.STATIC_DRAW);
+            gl.uniform4f(colorUniformLocation, 0.0, 1.0, 1.0, 1.0);
+            gl.drawArrays(gl.POINTS, 0, lineVertices.length/2);
+
+            console.log(lineVertices);
         }
 
 
