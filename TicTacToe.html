@@ -17,13 +17,15 @@ by two players. Entirely drawn with points.
     attribute vec4 vPos;
     void main() {
         gl_Position = vPos;
+        gl_PointSize = 1.0;
     }
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
     precision mediump float;
+    uniform vec4 u_color;
     void main() {
-        gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+        gl_FragColor = u_color;
     }
 </script>
 
@@ -44,26 +46,31 @@ by two players. Entirely drawn with points.
             }
 
             gl.viewport(0, 0, canvas.width, canvas.height);
-            gl.clearColor(1.0, 0.0, 1.0, 1.0); //TODO: Fill with another color
+            gl.clearColor(0.0, 0.0, 0.0, 1.0); //TODO: Fill with another color
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             var program = initShaders(gl, "vertex-shader", "fragment-shader");
+            gl.useProgram(program);
+
             var vPos = gl.getAttribLocation(program, "vPos");
             var colorUniformLocation = gl.getUniformLocation(program, "u_color");
+
             var buffer = gl.createBuffer();
-            gl.useProgram(program);
-            gl.enableVertexAttribArray(vPos);
-            gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
 
             var gameBoardVertices = returnGameBoardVertices(-800, -800, 800, 800);
             for (i=0; i < gameBoardVertices.length; i++)
                 gameBoardVertices[i] = gameBoardVertices[i]/1000.0;
 
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gameBoardVertices), gl.STATIC_DRAW);
-            gl.uniform4f(colorUniformLocation, 0.0, 1.0, 0.0, 1.0);
+            gl.enableVertexAttribArray(vPos);
+            gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
+
+            //Actual drawing
+            gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
             gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
 
-            
+            console.log(gameBoardVertices);
         }
 
 
