@@ -13,6 +13,8 @@ function returnVerticesDiagLine(x0, xEnd, y0, yEnd) {
    //TODO: These lines need to be thicker, but don't focus on this right now.
 
     /*I hate the way I wrote this, but what even is the alternative (＞﹏＜)*/
+    var lineSlope = deltaY/deltaX;
+
     if (lineSlope > -1 && lineSlope < 0) { //Slope is negative but X grows slower; increment X by one
         return returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd);
     }
@@ -31,7 +33,6 @@ function returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd) {
 
     var deltaY = yEnd - y0;
     var deltaX = xEnd - x0;
-    var lineSlope = deltaY/deltaX;
     var twoDeltaY = 2 * deltaY;
     var twoDeltaSubtraction = 2 * deltaY - 2 * deltaX;
 
@@ -43,6 +44,28 @@ function returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd) {
         }
         else {
             lineVertices.push(x0 + i + 1, lineVertices[2*i + 1] + 1); //Plot upper point
+            pk = pk + twoDeltaSubtraction;
+        }
+    }
+    return lineVertices;
+}
+
+function returnVerticesLineNegLargeSlope(x0, xEnd, y0, yEnd) {
+    var lineVertices = [x0, y0];
+
+    var deltaY = yEnd - y0;
+    var deltaX = xEnd - x0;
+    var twoDeltaX = 2 * deltaX;
+    var twoDeltaSubtraction = 2 * deltaX - 2 * deltaY;
+
+    for (i = 0; i < deltaY; i++) {
+        var pk = twoDeltaX - deltaY; //p0
+        if (pk < 0) {
+            lineVertices.push(lineVertices[2*i], y0 + i + 1); //Plot upper point
+            pk = pk + twoDeltaY;
+        }
+        else {
+            lineVertices.push(lineVertices[2*i] + 1, y0 + i + 1); //Plot lower point
             pk = pk + twoDeltaSubtraction;
         }
     }
