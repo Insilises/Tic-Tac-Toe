@@ -1,5 +1,6 @@
-function returnXPieceVertices(Minx, maxX, minY, maxY) {
-
+function returnXPieceVertices(x0, xEnd, y0, yEnd) {
+    var XPieceVertices = returnVerticesDiagLine(x0, xEnd, y0, yEnd);
+    XPieceVertices = XPieceVertices.concat(returnVerticesDiagLine())
 }
 
 function returnVerticesDiagLine(x0, xEnd, y0, yEnd) {
@@ -13,33 +14,36 @@ function returnVerticesDiagLine(x0, xEnd, y0, yEnd) {
    //TODO: These lines need to be thicker, but don't focus on this right now.
 
     /*I hate the way I wrote this, but what even is the alternative (＞﹏＜)*/
-    var lineSlope = deltaY/deltaX;
+    
+    var lineSlope = (yEnd-y0)/(xEnd-x0);
 
-    if (lineSlope > -1 && lineSlope < 0) { //Slope is negative but X grows slower; increment X by one
+    if (lineSlope > -1 && lineSlope < 0) {
         return returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd);
     }
-    else if (lineSlope < -1 && lineSlop < 0) { //Slope is negative but Y grows slower; increment Y by one
-        //return returnVerticesLineNegLargeSlope(x0, xEnd, y0, yEnd);
+    else if (lineSlope > -1 && lineSlope < 0) {
+        console.log("This part of the code hasn't been written yet!");
+    }
+    else if (lineSlop < 1 && lineSlope > 0) {
+        return returnVerticesLinePosSmallSlope(x0, xEnd, y0, yEnd);
     }
     else {
-        console.log("This part of the code hasn't been written yet!");
-        return lineVertices;
+        return returnVerticesLinePosLargeSlope(x0, xEnd, y0, yEnd);
     }
 
 }
 
-function returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd) {
+function returnVerticesLinePosSmallSlope(x0, xEnd, y0, yEnd) {
     var lineVertices = [x0, y0];
 
-    var deltaY = yEnd - y0;
-    var deltaX = xEnd - x0;
+    var deltaY = Math.abs(yEnd - y0);
+    var deltaX = Math.abs(xEnd - x0);
     var twoDeltaY = 2 * deltaY;
     var twoDeltaSubtraction = 2 * deltaY - 2 * deltaX;
 
     for (i = 0; i < deltaX; i++) {
         var pk = twoDeltaY - deltaX; //p0
         if (pk < 0) {
-            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1]); //Plot lower point
+            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1]); //Stay
             pk = pk + twoDeltaY;
         }
         else {
@@ -50,7 +54,7 @@ function returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd) {
     return lineVertices;
 }
 
-function returnVerticesLineNegLargeSlope(x0, xEnd, y0, yEnd) {
+function returnVerticesLinePosLargeSlope(x0, xEnd, y0, yEnd) {
     var lineVertices = [x0, y0];
 
     var deltaY = yEnd - y0;
@@ -61,11 +65,33 @@ function returnVerticesLineNegLargeSlope(x0, xEnd, y0, yEnd) {
     for (i = 0; i < deltaY; i++) {
         var pk = twoDeltaX - deltaY; //p0
         if (pk < 0) {
-            lineVertices.push(lineVertices[2*i], y0 + i + 1); //Plot upper point
+            lineVertices.push(lineVertices[2*i], y0 + i + 1); //Stay
             pk = pk + twoDeltaY;
         }
         else {
-            lineVertices.push(lineVertices[2*i] + 1, y0 + i + 1); //Plot lower point
+            lineVertices.push(lineVertices[2*i] + 1, y0 + i + 1); //Plot upper point
+            pk = pk + twoDeltaSubtraction;
+        }
+    }
+    return lineVertices;
+}
+
+function returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd) {
+    var lineVertices = [x0, y0];
+
+    var deltaY = Math.abs(yEnd - y0);
+    var deltaX = Math.abs(xEnd - x0);
+    var twoDeltaY = 2 * deltaY;
+    var twoDeltaSubtraction = 2 * deltaY - 2 * deltaX;
+
+    for (i = 0; i < deltaX; i++) {
+        var pk = twoDeltaY - deltaX; //p0
+        if (pk < 0) {
+            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1]); //Stay
+            pk = pk + twoDeltaY;
+        }
+        else {
+            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1] - 1); //Plot lower point
             pk = pk + twoDeltaSubtraction;
         }
     }
