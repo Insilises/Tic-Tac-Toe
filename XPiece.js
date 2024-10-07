@@ -1,9 +1,12 @@
-function returnXPieceVertices(x0, xEnd, y0, yEnd) {
-    var XPieceVertices = returnVerticesDiagLine(x0, xEnd, y0, yEnd);
-    XPieceVertices = XPieceVertices.concat(returnVerticesDiagLine())
+function returnXPieceVertices(minX, minY, maxX, maxY) {
+
+    var XPieceVertices = returnVerticesDiagLine(minX, minY, maxX, maxY); //Bottom left to top right
+    XPieceVertices = XPieceVertices.concat(returnVerticesDiagLine(minX, maxY, maxX, minY)); //Top left to bottom right
+
+    return XPieceVertices;
 }
 
-function returnVerticesDiagLine(x0, xEnd, y0, yEnd) {
+function returnVerticesDiagLine(minX, minY, maxX, maxY) {
     /*Pseudocode:
     Find (x,y) points of the beginning and end points of the line
     Plot the first point
@@ -15,83 +18,63 @@ function returnVerticesDiagLine(x0, xEnd, y0, yEnd) {
 
     /*I hate the way I wrote this, but what even is the alternative (＞﹏＜)*/
     
-    var lineSlope = (yEnd-y0)/(xEnd-x0);
+    var lineSlope = (maxY - minY)/(maxX - minX);
 
-    if (lineSlope > -1 && lineSlope < 0) {
-        return returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd);
-    }
-    else if (lineSlope > -1 && lineSlope < 0) {
-        console.log("This part of the code hasn't been written yet!");
-    }
-    else if (lineSlop < 1 && lineSlope > 0) {
-        return returnVerticesLinePosSmallSlope(x0, xEnd, y0, yEnd);
-    }
-    else {
-        return returnVerticesLinePosLargeSlope(x0, xEnd, y0, yEnd);
-    }
+    if (lineSlope > 0)
+        var positiveSlope = true;
+    else
+        var positiveSlope = false;
 
+    if (lineSlope > 1 || lineSlope < -1)
+        return returnLineLargeSlope(minX, minY, maxX, maxY, positiveSlope);
+    else
+        return returnLineSmallSlope(minX, minY, maxX, maxY, positiveSlope);
 }
 
-function returnVerticesLinePosSmallSlope(x0, xEnd, y0, yEnd) {
-    var lineVertices = [x0, y0];
+function returnLineSmallSlope(minX, minY, maxX, maxY, positiveSlope) {
+    var lineVertices = [minX, minY];
 
-    var deltaY = Math.abs(yEnd - y0);
-    var deltaX = Math.abs(xEnd - x0);
+    var deltaY = Math.abs(maxY - minY);
+    var deltaX = Math.abs(maxX - minX);
     var twoDeltaY = 2 * deltaY;
     var twoDeltaSubtraction = 2 * deltaY - 2 * deltaX;
 
     for (i = 0; i < deltaX; i++) {
         var pk = twoDeltaY - deltaX; //p0
-        if (pk < 0) {
-            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1]); //Stay
+        if (pk < 0) {   //Stay
+            lineVertices.push(minX + i + 1, lineVertices[2*i + 1]); 
             pk = pk + twoDeltaY;
         }
-        else {
-            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1] + 1); //Plot upper point
+        else {  //Plot upper point
+            if (positiveSlope == true)
+                lineVertices.push(minX + i + 1, lineVertices[2*i + 1] + 1);
+            else
+                lineVertices.push(minX + i + 1, lineVertices[2*i + 1] - 1);
             pk = pk + twoDeltaSubtraction;
         }
     }
     return lineVertices;
 }
 
-function returnVerticesLinePosLargeSlope(x0, xEnd, y0, yEnd) {
-    var lineVertices = [x0, y0];
+function returnLineLargeSlope(minX, minY, maxX, maxY, positiveSlope) {
+    var lineVertices = [minX, minY];
 
-    var deltaY = yEnd - y0;
-    var deltaX = xEnd - x0;
+    var deltaY = maxY - minY;
+    var deltaX = maxX - minX;
     var twoDeltaX = 2 * deltaX;
     var twoDeltaSubtraction = 2 * deltaX - 2 * deltaY;
 
     for (i = 0; i < deltaY; i++) {
         var pk = twoDeltaX - deltaY; //p0
-        if (pk < 0) {
-            lineVertices.push(lineVertices[2*i], y0 + i + 1); //Stay
+        if (pk < 0) {   //Stay
+            lineVertices.push(lineVertices[2*i], minY + i + 1);
             pk = pk + twoDeltaY;
         }
-        else {
-            lineVertices.push(lineVertices[2*i] + 1, y0 + i + 1); //Plot upper point
-            pk = pk + twoDeltaSubtraction;
-        }
-    }
-    return lineVertices;
-}
-
-function returnVerticesLineNegSmallSlope(x0, xEnd, y0, yEnd) {
-    var lineVertices = [x0, y0];
-
-    var deltaY = Math.abs(yEnd - y0);
-    var deltaX = Math.abs(xEnd - x0);
-    var twoDeltaY = 2 * deltaY;
-    var twoDeltaSubtraction = 2 * deltaY - 2 * deltaX;
-
-    for (i = 0; i < deltaX; i++) {
-        var pk = twoDeltaY - deltaX; //p0
-        if (pk < 0) {
-            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1]); //Stay
-            pk = pk + twoDeltaY;
-        }
-        else {
-            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1] - 1); //Plot lower point
+        else {  //Plot upper point
+            if (positiveSlope == true)
+                lineVertices.push(lineVertices[2*i] + 1, minY + i + 1);
+            else
+                lineVertices.push(lineVertices[2*i] - 1, minY + i + 1);
             pk = pk + twoDeltaSubtraction;
         }
     }

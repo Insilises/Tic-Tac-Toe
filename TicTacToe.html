@@ -73,9 +73,7 @@ by two players. Entirely drawn with points.
 
             //TODO: Remove later; this is just to test before trying inputs
             //Drawing a line for the X Piece
-            //var lineVertices = returnXPieceVertices(800, 267, -267, -800); //Drawing in top left square?
-
-            var lineVertices = returnVerticesLineNegSmallSlope(-800, -267, 800, 267);
+            var lineVertices = returnXPieceVertices(-800, 267, -267, 800); //Drawing in top left square?
 
             for (i=0; i < lineVertices.length; i++) {
                 lineVertices[i] = lineVertices[i]/1000.0;
