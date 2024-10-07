@@ -58,7 +58,7 @@ by two players. Entirely drawn with points.
 
             var buffer = gl.createBuffer();
 
-            var gameBoardVertices = returnGameBoardVertices(-800, -800, 800, 800);
+            var gameBoardVertices = returnGameBoardVertices(-800, -500, 800, 500);
             for (i=0; i < gameBoardVertices.length; i++)
                 gameBoardVertices[i] = gameBoardVertices[i]/1000.0;
 
@@ -73,7 +73,7 @@ by two players. Entirely drawn with points.
 
             //TODO: Remove later; this is just to test before trying inputs
             //Drawing a line for the X Piece
-            var lineVertices = returnXPieceVertices(-800, 267, -267, 800); //Drawing in top left square?
+            var lineVertices = returnXPieceVertices(-800, 167, -267, 500); //Drawing in top left square?
 
             for (i=0; i < lineVertices.length; i++) {
                 lineVertices[i] = lineVertices[i]/1000.0;

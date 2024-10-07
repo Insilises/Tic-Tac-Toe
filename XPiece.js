@@ -1,24 +1,31 @@
-function returnXPieceVertices(minX, minY, maxX, maxY) {
-
-    var XPieceVertices = returnVerticesDiagLine(minX, minY, maxX, maxY); //Bottom left to top right
-    XPieceVertices = XPieceVertices.concat(returnVerticesDiagLine(minX, maxY, maxX, minY)); //Top left to bottom right
+/**Returns the vertices for drawing an X Piece for the tic tac toe X player
+ * using points
+ * 
+ * @param {*} minX Minimum X value of the square the piece will fit in
+ * @param {*} minY Minimum Y value of the square the piece will fit in
+ * @param {*} maxX Maximum X value of the square the piece will fit in
+ * @param {*} maxY Maximum Y value of the square the piece will fit in
+ * @returns XPieceVertices The vertices for drawing an X Piece
+ */
+function returnXPieceVertices(minX, minY, maxX, maxY) {    
+    var XPieceVertices = returnDiagLine(minX, minY, maxX, maxY); //Bottom left to top right
+    XPieceVertices = XPieceVertices.concat(returnDiagLine(minX, maxY, maxX, minY)); //Top left to bottom right
 
     return XPieceVertices;
 }
 
-function returnVerticesDiagLine(minX, minY, maxX, maxY) {
-    /*Pseudocode:
-    Find (x,y) points of the beginning and end points of the line
-    Plot the first point
-    Calculate the constants
-    Calculate decision test parameter (p0)
-    Use decision test parameter to plot the line as X or y increases
-    */
-   //TODO: These lines need to be thicker, but don't focus on this right now.
-
-    /*I hate the way I wrote this, but what even is the alternative (＞﹏＜)*/
+/**Returns the vertices for a diagonal line of any slope using points
+ * 
+ * @param {*} x0 Beginning x value of the line
+ * @param {*} y0 Beginning y value of the line
+ * @param {*} xEnd Final x value of the line
+ * @param {*} yEnd Final y value of the line
+ * @returns lineVertices The vertices for a diagonal line of any slope 
+ * using points
+ */
+function returnDiagLine(x0, y0, xEnd, yEnd) {
     
-    var lineSlope = (maxY - minY)/(maxX - minX);
+    var lineSlope = (yEnd - y0)/(xEnd - x0);
 
     if (lineSlope > 0)
         var positiveSlope = true;
@@ -26,55 +33,77 @@ function returnVerticesDiagLine(minX, minY, maxX, maxY) {
         var positiveSlope = false;
 
     if (lineSlope > 1 || lineSlope < -1)
-        return returnLineLargeSlope(minX, minY, maxX, maxY, positiveSlope);
+        return returnLineLargeSlope(x0, y0, xEnd, yEnd, positiveSlope);
     else
-        return returnLineSmallSlope(minX, minY, maxX, maxY, positiveSlope);
+        return returnLineSmallSlope(x0, y0, xEnd, yEnd, positiveSlope);
 }
 
-function returnLineSmallSlope(minX, minY, maxX, maxY, positiveSlope) {
-    var lineVertices = [minX, minY];
+/**Returns the vertices to draw a line with a slope less than one with
+ * points
+ * 
+ * @param {*} x0 Beginning x value of the line
+ * @param {*} y0 Beginning y value of the line
+ * @param {*} xEnd Final x value of the line
+ * @param {*} yEnd Final y value of the line
+ * @param {*} positiveSlope Boolean value; true when the slope is positive
+ * @returns lineVertices The vertices to draw a line with a slope less than one
+ */
+function returnLineSmallSlope(x0, y0, xEnd, yEnd, positiveSlope) {
+    var lineVertices = [x0, y0];
 
-    var deltaY = Math.abs(maxY - minY);
-    var deltaX = Math.abs(maxX - minX);
+    var deltaY = Math.abs(yEnd - y0);
+    var deltaX = Math.abs(xEnd - x0);
     var twoDeltaY = 2 * deltaY;
     var twoDeltaSubtraction = 2 * deltaY - 2 * deltaX;
-
+    
+    pk = twoDeltaY - deltaX; //p0
     for (i = 0; i < deltaX; i++) {
-        var pk = twoDeltaY - deltaX; //p0
+        console.log(pk); //Test
         if (pk < 0) {   //Stay
-            lineVertices.push(minX + i + 1, lineVertices[2*i + 1]); 
+            lineVertices.push(x0 + i + 1, lineVertices[2*i + 1]);
             pk = pk + twoDeltaY;
         }
-        else {  //Plot upper point
+        else {  //Plot up or down
             if (positiveSlope == true)
-                lineVertices.push(minX + i + 1, lineVertices[2*i + 1] + 1);
+                lineVertices.push(x0 + i + 1, lineVertices[2*i + 1] + 1);
             else
-                lineVertices.push(minX + i + 1, lineVertices[2*i + 1] - 1);
+                lineVertices.push(x0 + i + 1, lineVertices[2*i + 1] - 1);
             pk = pk + twoDeltaSubtraction;
         }
     }
     return lineVertices;
 }
 
-function returnLineLargeSlope(minX, minY, maxX, maxY, positiveSlope) {
-    var lineVertices = [minX, minY];
+/**Returns the vertices to draw a line with a slope greater than one with
+ * points
+ * 
+ * @param {*} x0 Beginning x value of the line
+ * @param {*} y0 Beginning y value of the line
+ * @param {*} xEnd Final x value of the line
+ * @param {*} yEnd Final y value of the line
+ * @param {*} positiveSlope Boolean value; true when the slope is positive
+ * @returns lineVertices The vertices to draw a line with a slope greater than one
+ */
+function returnLineLargeSlope(x0, y0, xEnd, yEnd, positiveSlope) {
+    var lineVertices = [x0, y0];
 
-    var deltaY = maxY - minY;
-    var deltaX = maxX - minX;
+    var deltaY = Math.abs(yEnd - y0);
+    var deltaX = Math.abs(xEnd - x0);
     var twoDeltaX = 2 * deltaX;
     var twoDeltaSubtraction = 2 * deltaX - 2 * deltaY;
 
+    var pk = twoDeltaX - deltaY; //p0
+
     for (i = 0; i < deltaY; i++) {
-        var pk = twoDeltaX - deltaY; //p0
         if (pk < 0) {   //Stay
-            lineVertices.push(lineVertices[2*i], minY + i + 1);
+            lineVertices.push(lineVertices[2*i], y0 + i + 1);
             pk = pk + twoDeltaY;
         }
         else {  //Plot upper point
             if (positiveSlope == true)
-                lineVertices.push(lineVertices[2*i] + 1, minY + i + 1);
+                lineVertices.push(lineVertices[2*i] + 1, y0 + i + 1);
             else
-                lineVertices.push(lineVertices[2*i] - 1, minY + i + 1);
+                lineVertices.push(lineVertices[2*i] - 1, y0 + i + 1);
             pk = pk + twoDeltaSubtraction;
         }
     }
