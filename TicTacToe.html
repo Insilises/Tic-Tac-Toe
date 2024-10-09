@@ -89,13 +89,15 @@ by two players. Entirely drawn with points.
             */
 
             //var OPiece = returnSymmetricPointsOnCircle(191, 982, 0, 0); //0.191, 0.982
-            var OPiece = returnOPieceVertices(0, 0, 500);
+            var OPiece = returnOPieceVertices(-800, 500, 200);
 
             //console.log(OPiece);
             
             for (i=0; i < OPiece.length; i++) {
                 OPiece[i] = OPiece[i]/1000.0;
             }
+
+            console.log("OPiece = " + OPiece);
 
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(OPiece), gl.STATIC_DRAW);
             gl.uniform4f(colorUniformLocation, 0.0, 1.0, 1.0, 1.0);
