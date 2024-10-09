@@ -52,19 +52,21 @@ function returnSymmetricPointsOnCircle(pointX, pointY, midPointX, midPointY) {
     //Quad one top left is already pointX, pointY; Don't plot it again
     var symmetricVertices = [pointY, pointX]; //Quad one bottom right
 
-    /*
+    
     //Quad 4
     symmetricVertices.push(pointY, -pointX); //Quad 4 top right
     symmetricVertices.push(pointX, -pointY); //Quad 4 bottom left
-
+    
+    
     //Quad 3
     symmetricVertices.push(-pointX, -pointY); //Quad 3 bottom right
     symmetricVertices.push(-pointY, -pointX); //Quad 3 top left
 
+    
     //Quad 2
     symmetricVertices.push(-pointY, pointX); //Quad 2 bottom left
     symmetricVertices.push(-pointX, pointY); //Quad 2 top right
-    */
+    
 
 
     //console.log("SymVert = " + symmetricVertices);
