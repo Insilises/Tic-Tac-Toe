@@ -14,13 +14,14 @@ function returnGameBoardVertices(minX, minY, maxX, maxY) {
 
     //TODO: Actually use these functions to create the tic tac toe board
     var gameBoardVertices = returnVerticalLineVertices(minX + xSectionSize, 
-        minY, maxY);
+        minY, maxY); 
     gameBoardVertices = gameBoardVertices.concat(returnVerticalLineVertices(minX + 2 * xSectionSize,
         minY, maxY));
     gameBoardVertices = gameBoardVertices.concat(returnHorizontalVertices(minY + ySectionSize,
         minX, maxX));
     gameBoardVertices = gameBoardVertices.concat(returnHorizontalVertices(minY + 2 * ySectionSize,
         minX, maxX));
+
     return gameBoardVertices;
 }
 
@@ -35,7 +36,7 @@ function returnGameBoardVertices(minX, minY, maxX, maxY) {
 function returnVerticalLineVertices(xValue, minY, maxY) {
     var height = maxY - minY;
     var lineVerticesPoints = [xValue, minY];
-    for (i=0; i < height; i++)
+    for (i=1; i < height; i++)
         lineVerticesPoints.push(xValue, minY + i,   xValue + 1, minY + i);
     return lineVerticesPoints;
 }
@@ -50,8 +51,8 @@ function returnVerticalLineVertices(xValue, minY, maxY) {
  */
 function returnHorizontalVertices(yValue, minX, maxX) {
     var width = maxX - minX;
-    var lineVerticesPoints = [yValue, minX];
-    for (i=0; i < width; i++)
+    var lineVerticesPoints = [minX, yValue];
+    for (i=1; i < width; i++)
         lineVerticesPoints.push(minX + i, yValue,   minX + i, yValue + 1);
     return lineVerticesPoints;
 }

@@ -70,38 +70,9 @@ by two players. Entirely drawn with points.
 
             //Actual drawing
             gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
-            //gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
-            
-            /*
-            //TODO: Remove later; this is just to test before trying inputs
-            //Drawing a line for the X Piece
-            //var lineVertices = returnXPieceVertices(-800, 167, -267, 500); //Drawing in top left square?
+            gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
 
-            for (i=0; i < lineVertices.length; i++) {
-                lineVertices[i] = lineVertices[i]/1000.0;
-            }
-
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineVertices), gl.STATIC_DRAW);
-            gl.uniform4f(colorUniformLocation, 0.0, 1.0, 1.0, 1.0);
-            gl.drawArrays(gl.POINTS, 0, lineVertices.length/2);
-
-            console.log(lineVertices);
-            */
-
-            //var OPiece = returnSymmetricPointsOnCircle(191, 982, 0, 0); //0.191, 0.982
-            var OPiece = returnOPieceVertices(-800, 500, 200);
-
-            //console.log(OPiece);
-            
-            for (i=0; i < OPiece.length; i++) {
-                OPiece[i] = OPiece[i]/1000.0;
-            }
-
-            console.log("OPiece = " + OPiece);
-
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(OPiece), gl.STATIC_DRAW);
-            gl.uniform4f(colorUniformLocation, 0.0, 1.0, 1.0, 1.0);
-            gl.drawArrays(gl.POINTS, 0, OPiece.length/2);
+            console.log(gameBoardVertices);
         }
 
 
