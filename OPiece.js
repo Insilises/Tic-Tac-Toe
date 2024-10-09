@@ -9,8 +9,8 @@ function returnOPieceVertices(midPointX, midPointY, radius) {
     */
     
     var oVertices = [midPointX, midPointY + radius]; //First point
-    //TODO: Symmetry
 
+    //This loop works.
     var pk = 5/4 - radius;
     for (i=0; oVertices[2*i] < oVertices[2*i + 1]; i++) {
         if (pk < 0) {   //Stay on the same row 
@@ -23,7 +23,14 @@ function returnOPieceVertices(midPointX, midPointY, radius) {
         }
     }
 
-    console.log(oVertices);
+    var symmetricPoints = returnSymmetricPointsOnCircle(oVertices[0], oVertices[1], midPointX, midPointY);
+    for (i=0; i < oVertices.length; i++)
+        symmetricPoints = symmetricPoints.concat(returnSymmetricPointsOnCircle(oVertices[2*i], oVertices[2*i + 1], midPointX, midPointY));
+    
+    console.log("Symmetric = " + symmetricPoints);
+    console.log("oVert = " + oVertices);
+    
+    oVertices = oVertices.concat(symmetricPoints);
     return oVertices;
 }
 
@@ -37,11 +44,15 @@ function returnOPieceVertices(midPointX, midPointY, radius) {
  * @returns 
  */
 function returnSymmetricPointsOnCircle(pointX, pointY, midPointX, midPointY) {
+    /*TODO: I'll have to change some things to make it so the answer depends on midpoint
+    You know, so we can make circles that aren't dead center in the screen. I need the
+    symmetry to work first before I can do that. */
 
     //Quadrant 1
-    var symmetricVertices = [pointX, pointY]; //Quad one top left
-    symmetricVertices.push(pointY, pointX); //Quad one bottom right
+    //Quad one top left is already pointX, pointY; Don't plot it again
+    var symmetricVertices = [pointY, pointX]; //Quad one bottom right
 
+    /*
     //Quad 4
     symmetricVertices.push(pointY, -pointX); //Quad 4 top right
     symmetricVertices.push(pointX, -pointY); //Quad 4 bottom left
@@ -53,6 +64,9 @@ function returnSymmetricPointsOnCircle(pointX, pointY, midPointX, midPointY) {
     //Quad 2
     symmetricVertices.push(-pointY, pointX); //Quad 2 bottom left
     symmetricVertices.push(-pointX, pointY); //Quad 2 top right
-    console.log(symmetricVertices);
+    */
+
+
+    //console.log("SymVert = " + symmetricVertices);
     return symmetricVertices;
 }
