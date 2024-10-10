@@ -38,12 +38,9 @@ by two players. Entirely drawn with points.
     <script type = "text/javascript">
         var canvas;
         var gl;
+        var release = false;
 
         window.onload = init;
-
-        var wasInitialized = false;
-        var release = false;
-        var drawVertices = [];
 
         function init() {
             canvas = document.getElementById("gl-canvas");
@@ -64,75 +61,67 @@ by two players. Entirely drawn with points.
 
             var buffer = gl.createBuffer();
             
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.enableVertexAttribArray(vPos);
+            gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
+            
+
+            console.log("Initialized");
+            var renderVertices = [0];
+
+            render(colorUniformLocation, renderVertices);
+        }
+
+        function render(colorUniformLocation, vertices) {
+            //TODO: I know the vertices are right for gameboard, but WHY IS IT BLACK
+            //The background needs to be black. The board needs to be white. WHY IS IT BLACKKKKK
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            vertices = [0,1]; //For testing purposes ig
+            var pieceColor = [0, 0, 0, 1];
+
             var gameBoardVertices = returnGameBoardVertices(-800, -500, 800, 500);
             for (i=0; i < gameBoardVertices.length; i++)
                 gameBoardVertices[i] = gameBoardVertices[i]/1000.0;
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gameBoardVertices), gl.STATIC_DRAW);
-            gl.enableVertexAttribArray(vPos);
-            gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
 
             //Actual drawing
             gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
             gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
 
-            console.log("Initialized");
-
-            
-            
-            canvas.addEventListener("mouseup", mouseUp);
-            canvas.addEventListener("mousedown", mouseDown);
-
-            
-            render();
-        }
-
-        function render() {
-
-            console.log("Rendered");
-            requestAnimationFrame(function() { render() }); 
-        }
-
-        function mouseDown(event) {
-                if ((event.button == 0) && (release)) { //Left click input and release
-                    mouseX = event.pageX;
-                    mouseY = event.pageY;
-
-                    var program = initShaders(gl, "vertex-shader", "fragment-shader");
-                    gl.useProgram(program);
-
-                    var vPos = gl.getAttribLocation(program, "vPos");
-                    var colorUniformLocation = gl.getUniformLocation(program, "u_color");
-
-                    var buffer = gl.createBuffer();
-
-                    var vertices = determineSquarePosition(mouseX * 1000, mouseY * 1000);
+            var mouseDown = function(event) {
+                if ((event.button === 0)  && (release)) {
+                    mouseX = event.pageX * 1000;
+                    mouseY = event.pageY * 1000;
+                    var pieceColor = [1.0, 1.0, 0, 1.0];
                     
-                    //I feel terrible for not making this more modular. I did so well
-                    //making these functions, and it was all for what??
-                    drawVertices = returnXPieceVertices(vertices[0], vertices[1], vertices[0] + 533, vertices[1] + 333);
+                    var xPieceSquarePosition = determineSquarePosition(mouseX, mouseY);
 
-                    for (i=0; i < drawVertices.length; i++)
-                        drawVertices[i] = drawVertices[i]/1000.0;
-
-                    //Actual drawing
-
-                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(drawVertices), gl.STATIC_DRAW);
-                    gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
-                    gl.drawArrays(gl.POINTS, 0, drawVertices.length / 2);
-
-                    console.log("mouse went down & up");
-                    
-                }
-                release = false;
-                //TODO: Write for event where button == 2 (right click)
+                    vertices = returnXPieceVertices(xPieceSquarePosition[0], xPieceSquarePosition[1],
+                        xPieceSquarePosition[0] + 533, xPieceSquarePosition[1] + 333);
+                    release = false;
+                } 
+                //TODO: Write for button 2 (right click)
             }
+            canvas.addEventListener("mousedown", mouseDown, { once: true });
 
-            function mouseUp(event) {
+            var mouseUp = function(event) {
                 release = true;
-                console.log("mouse went Up");
             }
+            canvas.addEventListener("mouseup", mouseUp);
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    
+            gl.uniform4f(colorUniformLocation, pieceColor[0], pieceColor[1], pieceColor[2], pieceColor[3]);
+
+            gl.drawArrays(gl.POINTS, 0, vertices.length/2);
+            console.log("Rendered: " + vertices);
+            requestAnimFrame(function() { render() }); 
+        }
+    
+
 
         /**Given a point, determines the bottom left point of the square the input was in.
          * Returns ___ if it was outside the square.
