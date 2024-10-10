@@ -47,12 +47,12 @@ function returnOPieceVertices(midPointX, midPointY, radius) {
 /**Given one point in the top left of quadrant 1 and the midpoint of a circle, return seven more
  * points, all calculated based on the fact that circles are symmetrical.
  * 
- * @param {*} pointX 
- * @param {*} pointY 
- * @param {*} midPointX 
- * @param {*} midPointY 
- * @param {*} radius
- * @returns symmetricVertices
+ * @param {*} pointX X value of the point that needs symmetrical points
+ * @param {*} pointY Y value of the point that needs symmetrical points
+ * @param {*} midPointX The X value in the middle of the circle
+ * @param {*} midPointY The Y value in the middle of the circle
+ * @param {*} radius The radius of the circle
+ * @returns symmetricVertices Seven points around a circle, symmetrical to the given point
  */
 function returnSymmetricPointsOnCircle(pointX, pointY, midPointX, midPointY) {
 

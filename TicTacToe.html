@@ -38,7 +38,12 @@ by two players. Entirely drawn with points.
     <script type = "text/javascript">
         var canvas;
         var gl;
+
         window.onload = init;
+
+        var wasInitialized = false;
+        var release = false;
+        var drawVertices = [];
 
         function init() {
             canvas = document.getElementById("gl-canvas");
@@ -46,7 +51,7 @@ by two players. Entirely drawn with points.
             if (!gl) {
                 alert("WebGL isn't available");
             }
-
+            
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.clearColor(0.0, 0.0, 0.0, 1.0); //TODO: Fill with another color
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -58,7 +63,7 @@ by two players. Entirely drawn with points.
             var colorUniformLocation = gl.getUniformLocation(program, "u_color");
 
             var buffer = gl.createBuffer();
-
+            
             var gameBoardVertices = returnGameBoardVertices(-800, -500, 800, 500);
             for (i=0; i < gameBoardVertices.length; i++)
                 gameBoardVertices[i] = gameBoardVertices[i]/1000.0;
@@ -72,10 +77,96 @@ by two players. Entirely drawn with points.
             gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
             gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
 
-            console.log(gameBoardVertices);
+            console.log("Initialized");
+
+            
+            
+            canvas.addEventListener("mouseup", mouseUp);
+            canvas.addEventListener("mousedown", mouseDown);
+
+            
+            render();
         }
 
+        function render() {
 
+            console.log("Rendered");
+            requestAnimationFrame(function() { render() }); 
+        }
+
+        function mouseDown(event) {
+                if ((event.button == 0) && (release)) { //Left click input and release
+                    mouseX = event.pageX;
+                    mouseY = event.pageY;
+
+                    var program = initShaders(gl, "vertex-shader", "fragment-shader");
+                    gl.useProgram(program);
+
+                    var vPos = gl.getAttribLocation(program, "vPos");
+                    var colorUniformLocation = gl.getUniformLocation(program, "u_color");
+
+                    var buffer = gl.createBuffer();
+
+                    var vertices = determineSquarePosition(mouseX * 1000, mouseY * 1000);
+                    
+                    //I feel terrible for not making this more modular. I did so well
+                    //making these functions, and it was all for what??
+                    drawVertices = returnXPieceVertices(vertices[0], vertices[1], vertices[0] + 533, vertices[1] + 333);
+
+                    for (i=0; i < drawVertices.length; i++)
+                        drawVertices[i] = drawVertices[i]/1000.0;
+
+                    //Actual drawing
+
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(drawVertices), gl.STATIC_DRAW);
+                    gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
+                    gl.drawArrays(gl.POINTS, 0, drawVertices.length / 2);
+
+                    console.log("mouse went down & up");
+                    
+                }
+                release = false;
+                //TODO: Write for event where button == 2 (right click)
+            }
+
+            function mouseUp(event) {
+                release = true;
+                console.log("mouse went Up");
+            }
+
+        /**Given a point, determines the bottom left point of the square the input was in.
+         * Returns ___ if it was outside the square.
+        * @param {*} xPosition The X value of the input
+        * @param {*} yPosition The Y value of the input
+        * @returns An array containing the X and Y position that
+        * indicates the bottom left corner of one of the board squares
+        */
+        function determineSquarePosition(xPosition, yPosition) {
+            var sectionPositionX;
+            var sectionPositionY;
+
+             //Was the click in the grid?
+            if (xPosition > -800 && xPosition < 800) {
+                if (yPosition > -500 && yPosition < 500) {
+                    //Was it left, middle, or right?
+                    if (xPosition < -267)
+                        sectionPositionX = -800;
+                    else if (xPosition < 267)
+                        sectionPositionX = -267;
+                    else
+                        sectionPositionX = 267;
+
+                    //Was it bottom, middle, or top?
+                    if (yPosition < -167)
+                        sectionPositionY = -500;
+                    else if (yPosition < 0.167)
+                        sectionPositionY = -167;
+                    else
+                        sectionPositionY = 167;
+                }
+            }
+            return [sectionPositionX, sectionPositionY];
+        }
 
 
     </script>
