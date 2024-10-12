@@ -58,7 +58,6 @@ function returnLineSmallSlope(x0, y0, xEnd, yEnd, positiveSlope) {
     
     pk = twoDeltaY - deltaX; //p0
     for (i = 0; i < deltaX; i++) {
-        console.log(pk); //Test
         if (pk < 0) {   //Stay
             lineVertices.push(x0 + i + 1, lineVertices[2*i + 1]);
             pk = pk + twoDeltaY;
