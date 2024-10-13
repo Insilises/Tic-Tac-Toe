@@ -78,7 +78,6 @@ by two players. Entirely drawn with points.
             gl.enableVertexAttribArray(vPos);
             gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
             
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
             
             gameBoardVertices = returnGameBoardVertices(-800, -500, 800, 500);
             for (i=0; i < gameBoardVertices.length; i++)
@@ -89,29 +88,20 @@ by two players. Entirely drawn with points.
             
             
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gameBoardVertices), gl.STATIC_DRAW);
+            
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
             gl.clear(gl.COLOR_BUFFER_BIT);
+            
             gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
-            gl.drawArrays(gl.POINTS, 0, gameBoardVerticesLength/2);
+            gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
             
             //TODO: Remove snippets below and put them back in render (keeping in mind necessary changes)
-            var tempVertices = returnXPieceVertices(-267, -167, 267, 167);
-                        for (i=0; i < tempVertices.length; i++) {
-                            tempVertices[i] = tempVertices[i]/1000;
-                        }
-                        xPieceVertices = xPieceVertices.concat(tempVertices);
-            console.log(tempVertices);
-            var xPieceLength = 2140;
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
-            var xPieceCount = 0;
-        
-                gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
-                if (xPieceCount > 0)
-                    gl.drawArrays(gl.POINTS, xPieceCount * (xPieceLength/2), (xPieceLength/xPieceCount)/2);
-                else
-                    gl.drawArrays(gl.POINTS, 0, xPieceLength/2);
+            
+            
+                
 
             //console.log(gameBoardVertices);
-            //render();
+            render();
         }
 
         
@@ -123,30 +113,30 @@ by two players. Entirely drawn with points.
                 //This function seems to not be the problem?
                 //All the location stuff works; it seems like most of my problems have been
                 //from mismatched logic, so I wouldn't rule that out.
+                
                 if ((event.button === 0) && (release)) {
                     var mouseX = (event.pageX - 500) * 4;
                     var mouseY = (500 - event.pageY) * 4;
-
-                    if ((mouseX > -800) && (mouseX < 800) && (mouseY < 500) && mouseY > -500) {
+                    
+               //TODO: I've temporarily commented a lot (mostly event logic) out. There's something wrong here, and we'll find it.
+                    
+                    console.log("Button pressed.");
                         var squareMin = determineSquarePosition(mouseX, mouseY);
 
                         var tempVertices = returnXPieceVertices(squareMin[0], squareMin[1], squareMin[0] + 533, squareMin[1] + 333);
+                        
                         for (i=0; i < tempVertices.length; i++) {
                             tempVertices[i] = tempVertices[i]/1000;
                         }
-                        console.log(tempVertices);
                         xPieceVertices = xPieceVertices.concat(tempVertices);
-                        xPieceCount++;
-                        xPieceLength = xPieceVertices.length;
-                        lastPiece = 0;
-                        outOfBounds = false;
-                        console.log("xPiece is about to be drawn...");
-                    }
-                    else {
-                        outOfBounds = true;
-                    }
 
-                    console.log("Button pressed and released.");
+                        //console.log(tempVertices);
+                        xPieceCount++;
+                        xPieceLength = tempVertices.length;
+                        lastPiece = 0;
+                        console.log("xPiece is about to be drawn...");
+                    
+
                     release = false;
                 }
             }
@@ -157,20 +147,20 @@ by two players. Entirely drawn with points.
             canvas.addEventListener("mousedown", mouseDown);
             canvas.addEventListener("mouseup", mouseUp);
 
-            //TODO: Something is wrong with the logic here. We're not drawing when we should.
-            //See the console.log statements.
-            if (outOfBounds == false) {
-            if (lastPiece == 0); {
-                //if (xPieceCount != xPiecesDrawn) {
-                console.log("Drawing " + xPieceCount + " Vertices");
-                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
-                //gl.clear(gl.COLOR_BUFFER_BIT);
+            //TODO: Not sure what the issue is now.
+            if (lastPiece == 0) {
+                if (xPieceCount != xPiecesDrawn) {
+                    console.log("Drawing " + xPieceCount + " X pieces");
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
+                    
+                    //The vertices themselves are right... Maybe gl.drawArrays is wrong?
         
-                gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
-                gl.drawArrays(gl.POINTS, xPieceCount * (xPieceLength/2), (xPieceLength/xPieceCount)/2);
-                xPiecesDrawn++;
-            //}
-            }
+                    gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
+                        gl.drawArrays(gl.POINTS, ((xPieceCount - 1) * xPieceLength)/2, xPieceLength/2);
+                    xPiecesDrawn++;
+
+                    console.log(xPieceCount);
+                }
             }
 
             requestAnimFrame(render);
@@ -190,8 +180,6 @@ by two players. Entirely drawn with points.
             var sectionPositionY;
 
              //Was the click in the grid?
-            if (xPosition > -800 && xPosition < 800) {
-                if (yPosition > -500 && yPosition < 500) {
                     //Was it left, middle, or right?
                     if (xPosition < -267)
                         sectionPositionX = -800;
@@ -207,8 +195,6 @@ by two players. Entirely drawn with points.
                         sectionPositionY = -167;
                     else
                         sectionPositionY = 167;
-                }
-            }
             return [sectionPositionX, sectionPositionY];
         }
 
