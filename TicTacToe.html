@@ -43,14 +43,17 @@ by two players. Entirely drawn with points.
         //var pieceColors = [];
         var colorUniformLocation;
         var pointCount = 0;
-        var xPieceCount;
-        var oPieceCount;
+        var xPieceCount = 0;
+        var oPieceCount = 0;
         var xPieceVertices = [];
         var oPieceVertices = [];
         var gameBoardVertices = [];
-        var gameboardVerticesLength;
+        var gameBoardVerticesLength;
         var xPieceLength;
-        var oPieceLength
+        var xPiecesDrawn = 0;
+        var oPieceLength;
+        var outOfBounds;
+        var lastPiece;
 
         window.onload = init;
 
@@ -70,89 +73,106 @@ by two players. Entirely drawn with points.
             var colorUniformLocation = gl.getUniformLocation(program, "u_color");
 
             var buffer = gl.createBuffer();
-            
-
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
             gl.enableVertexAttribArray(vPos);
             gl.vertexAttribPointer(vPos, 2, gl.FLOAT, false, 0, 0);
-
+            
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            
             gameBoardVertices = returnGameBoardVertices(-800, -500, 800, 500);
             for (i=0; i < gameBoardVertices.length; i++)
                 gameBoardVertices[i] = gameBoardVertices[i]/1000.0;
 
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gameBoardVertices), gl.STATIC_DRAW);
-
-            //Actual drawing
-
-            gameboardVerticesLength = gameBoardVertices.length;
-
             console.log("Initialized");
 
             
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
             
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gameBoardVertices), gl.STATIC_DRAW);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
+            gl.drawArrays(gl.POINTS, 0, gameBoardVerticesLength/2);
             
-            //Something about render makes Init not run
-            render();
+            //TODO: Remove snippets below and put them back in render (keeping in mind necessary changes)
+            var tempVertices = returnXPieceVertices(-267, -167, 267, 167);
+                        for (i=0; i < tempVertices.length; i++) {
+                            tempVertices[i] = tempVertices[i]/1000;
+                        }
+                        xPieceVertices = xPieceVertices.concat(tempVertices);
+            console.log(tempVertices);
+            var xPieceLength = 2140;
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
+            var xPieceCount = 0;
+        
+                gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
+                if (xPieceCount > 0)
+                    gl.drawArrays(gl.POINTS, xPieceCount * (xPieceLength/2), (xPieceLength/xPieceCount)/2);
+                else
+                    gl.drawArrays(gl.POINTS, 0, xPieceLength/2);
 
-            
+            //console.log(gameBoardVertices);
+            //render();
         }
 
         
 
         function render() {
-
-            //TODO: Why does the gameboard appear red?
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
-            gl.drawArrays(gl.POINTS, 0, gameboardVerticesLength/2);
             
-
+            
             var mouseDown = function(event) {
+                //This function seems to not be the problem?
+                //All the location stuff works; it seems like most of my problems have been
+                //from mismatched logic, so I wouldn't rule that out.
+                if ((event.button === 0) && (release)) {
+                    var mouseX = (event.pageX - 500) * 4;
+                    var mouseY = (500 - event.pageY) * 4;
 
-                if ((event.button === 0)  && (release)) {
-                    mouseX = (event.pageX - 500) * 4;
-                    mouseY = (500 - event.pageY) * 4;
-                    
-                    var xPieceSquarePosition = determineSquarePosition(mouseX, mouseY);
-                    //In example, event.pageX - 250 * 4 is so that it goes to -500, 500
-                    var xVertices = returnXPieceVertices(xPieceSquarePosition[0], xPieceSquarePosition[1],
-                        xPieceSquarePosition[0] + 533, xPieceSquarePosition[1] + 333);
-                        
+                    if ((mouseX > -800) && (mouseX < 800) && (mouseY < 500) && mouseY > -500) {
+                        var squareMin = determineSquarePosition(mouseX, mouseY);
 
-                    for (i=0; i < xPieceVertices.length; i++)
-                        xPieceVertices[i] = xVertices[i]/1000.0;
-                    
-                    xPieceVertices = xPieceVertices.concat(xVertices);
-                    
-                    xPieceLength = xVertices.length;
-                            
-                        console.log("mouse down");
-                        
+                        var tempVertices = returnXPieceVertices(squareMin[0], squareMin[1], squareMin[0] + 533, squareMin[1] + 333);
+                        for (i=0; i < tempVertices.length; i++) {
+                            tempVertices[i] = tempVertices[i]/1000;
+                        }
+                        console.log(tempVertices);
+                        xPieceVertices = xPieceVertices.concat(tempVertices);
+                        xPieceCount++;
+                        xPieceLength = xPieceVertices.length;
+                        lastPiece = 0;
+                        outOfBounds = false;
+                        console.log("xPiece is about to be drawn...");
+                    }
+                    else {
+                        outOfBounds = true;
+                    }
+
+                    console.log("Button pressed and released.");
                     release = false;
-                    xPieceCount++;
-                } 
-                //TODO: Write for button 2 (right click)
+                }
             }
-            canvas.addEventListener("mousedown", mouseDown);
-
             var mouseUp = function(event) {
                 release = true;
-                console.log("Mouse up");
+                console.log("Button released");
             }
+            canvas.addEventListener("mousedown", mouseDown);
             canvas.addEventListener("mouseup", mouseUp);
-            
-            
-            /*
-            //TODO: Write loops that draw X vertices and O vertices separately. Like one loop for each.
-            gl.uniform4f(colorUniformLocation, 1.0, 1.0, 0, 1.0);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
-            for (i = 0; i < xPieceCount; i++) {
-                gl.drawArrays(gl.POINTS, 0, xPieceVertices/2);
+
+            //TODO: Something is wrong with the logic here. We're not drawing when we should.
+            //See the console.log statements.
+            if (outOfBounds == false) {
+            if (lastPiece == 0); {
+                //if (xPieceCount != xPiecesDrawn) {
+                console.log("Drawing " + xPieceCount + " Vertices");
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
+                //gl.clear(gl.COLOR_BUFFER_BIT);
+        
+                gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
+                gl.drawArrays(gl.POINTS, xPieceCount * (xPieceLength/2), (xPieceLength/xPieceCount)/2);
+                xPiecesDrawn++;
+            //}
             }
-            */
-            console.log("Rendered:");
-            //console.log("Rendered: " + vertices);
+            }
+
             requestAnimFrame(render);
         }
     
