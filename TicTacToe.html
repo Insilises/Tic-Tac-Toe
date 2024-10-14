@@ -39,20 +39,15 @@ by two players. Entirely drawn with points.
         var canvas;
         var gl;
         var release = true;
-        //var vertices = [];
-        //var pieceColors = [];
         var colorUniformLocation;
-        var pointCount = 0;
         var xPieceCount = 0;
         var oPieceCount = 0;
         var xPieceVertices = [];
         var oPieceVertices = [];
         var gameBoardVertices = [];
-        var gameBoardVerticesLength;
         var xPieceLength;
         var xPiecesDrawn = 0;
         var oPieceLength;
-        var outOfBounds;
         var lastPiece;
 
         window.onload = init;
@@ -87,15 +82,7 @@ by two players. Entirely drawn with points.
 
             
             
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gameBoardVertices), gl.STATIC_DRAW);
             
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            
-            gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
-            gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
-            
-            //TODO: Remove snippets below and put them back in render (keeping in mind necessary changes)
             
             
                 
@@ -107,19 +94,25 @@ by two players. Entirely drawn with points.
         
 
         function render() {
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(gameBoardVertices), gl.STATIC_DRAW);
             
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            
+            //TODO: Why are we red, same color as background?
+            gl.uniform4f(colorUniformLocation, 1.0, 1.0, 1.0, 1.0);
+            gl.drawArrays(gl.POINTS, 0, gameBoardVertices.length/2);
+
+            //Commenting out event logic to see why the board/black color is disappearing.
+            //Other X pieces after the first disappear as well.
             
             var mouseDown = function(event) {
-                //This function seems to not be the problem?
-                //All the location stuff works; it seems like most of my problems have been
-                //from mismatched logic, so I wouldn't rule that out.
                 
                 if ((event.button === 0) && (release)) {
                     var mouseX = (event.pageX - 500) * 4;
                     var mouseY = (500 - event.pageY) * 4;
-                    
-               //TODO: I've temporarily commented a lot (mostly event logic) out. There's something wrong here, and we'll find it.
-                    
+
                     console.log("Button pressed.");
                         var squareMin = determineSquarePosition(mouseX, mouseY);
 
@@ -147,22 +140,11 @@ by two players. Entirely drawn with points.
             canvas.addEventListener("mousedown", mouseDown);
             canvas.addEventListener("mouseup", mouseUp);
 
-            //TODO: Not sure what the issue is now.
-            if (lastPiece == 0) {
-                if (xPieceCount != xPiecesDrawn) {
-                    console.log("Drawing " + xPieceCount + " X pieces");
-                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
-                    
-                    //The vertices themselves are right... Maybe gl.drawArrays is wrong?
-        
-                    gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
-                        gl.drawArrays(gl.POINTS, ((xPieceCount - 1) * xPieceLength)/2, xPieceLength/2);
-                    xPiecesDrawn++;
-
-                    console.log(xPieceCount);
-                }
-            }
-
+            
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
+            gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
+            for (i=0; i < xPieceCount; i++)
+                gl.drawArrays(gl.POINTS, (i * xPieceLength)/2, xPieceLength/2);
             requestAnimFrame(render);
         }
     
