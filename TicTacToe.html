@@ -65,7 +65,7 @@ by two players. Entirely drawn with points.
             gl.useProgram(program);
 
             var vPos = gl.getAttribLocation(program, "vPos");
-            var colorUniformLocation = gl.getUniformLocation(program, "u_color");
+            colorUniformLocation = gl.getUniformLocation(program, "u_color");
 
             var buffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -145,6 +145,7 @@ by two players. Entirely drawn with points.
             gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
             for (i=0; i < xPieceCount; i++)
                 gl.drawArrays(gl.POINTS, (i * xPieceLength)/2, xPieceLength/2);
+            
             requestAnimFrame(render);
         }
     
