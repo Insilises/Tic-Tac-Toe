@@ -12,7 +12,6 @@ function returnGameBoardVertices(minX, minY, maxX, maxY) {
     var xSectionSize = (maxX - minX)/3;
     var ySectionSize = (maxY - minY)/3;
 
-    //TODO: Actually use these functions to create the tic tac toe board
     var gameBoardVertices = returnVerticalLineVertices(minX + xSectionSize, 
         minY, maxY); 
     gameBoardVertices = gameBoardVertices.concat(returnVerticalLineVertices(minX + 2 * xSectionSize,

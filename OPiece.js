@@ -75,7 +75,6 @@ function returnSymmetricPointsOnCircle(pointX, pointY, midPointX, midPointY) {
     //Quad 2
     symmetricVertices.push(-pointY, pointX); //Quad 2 bottom left
     symmetricVertices.push(-pointX, pointY); //Quad 2 top right
-    //TODO: Lots to do; maybe generate around 0,0, but we then use midpoints
 
     return symmetricVertices;
 }
