@@ -78,15 +78,7 @@ by two players. Entirely drawn with points.
                 gameBoardVertices[i] = gameBoardVertices[i]/1000.0;
 
             console.log("Initialized");
-
             
-            
-            
-            
-            
-                
-
-            //console.log(gameBoardVertices);
             render();
         }
 
@@ -113,13 +105,13 @@ by two players. Entirely drawn with points.
                         var squareMin = determineSquarePosition(mouseX, mouseY);
 
                         var tempVertices = returnXPieceVertices(squareMin[0], squareMin[1], squareMin[0] + 533, squareMin[1] + 333);
-                        
+                        tempVertices = addThickness(tempVertices, 3);
+
                         for (i=0; i < tempVertices.length; i++) {
                             tempVertices[i] = tempVertices[i]/1000;
                         }
                         xPieceVertices = xPieceVertices.concat(tempVertices);
 
-                        //console.log(tempVertices);
                         xPieceCount++;
                         xPieceLength = tempVertices.length;
                         console.log("xPiece is about to be drawn...");
@@ -134,15 +126,14 @@ by two players. Entirely drawn with points.
                     console.log("Button pressed.");
                         var squareMin = determineSquarePosition(mouseX, mouseY);
 
-                        //var tempVertices = returnOPieceVertices(squareMin[0], squareMin[1], squareMin[0] + 533, squareMin[1] + 333);
                         var tempVertices = returnOPieceVertices(squareMin[0] + 266, squareMin[1] + 166, 166);
-                        
+                        tempVertices = addThickness(tempVertices, 2);
+
                         for (i=0; i < tempVertices.length; i++) {
                             tempVertices[i] = tempVertices[i]/1000;
                         }
                         oPieceVertices = oPieceVertices.concat(tempVertices);
 
-                        //console.log(tempVertices);
                         oPieceCount++;
                         oPieceLength = tempVertices.length;
                         lastPiece = 1;
@@ -159,9 +150,6 @@ by two players. Entirely drawn with points.
             canvas.addEventListener("mousedown", mouseDown);
             canvas.addEventListener("mouseup", mouseUp);
 
-            //TODO: O pieces and X pieces can be drawn on top of each other.
-            //If there is time, fix this.
-            
             //Drawing all X Pieces
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(xPieceVertices), gl.STATIC_DRAW);
             gl.uniform4f(colorUniformLocation, 0, 0, 1, 1);
@@ -180,7 +168,8 @@ by two players. Entirely drawn with points.
 
 
         /**Given a point, determines the bottom left point of the square the input was in.
-         * Returns ___ if it was outside the square.
+         * There are no out of bounds coordinates; if the middle area was clicked above the board,
+         * the top middle square would be drawn in.
         * @param {*} xPosition The X value of the input
         * @param {*} yPosition The Y value of the input
         * @returns An array containing the X and Y position that
@@ -190,23 +179,51 @@ by two players. Entirely drawn with points.
             var sectionPositionX;
             var sectionPositionY;
 
-             //Was the click in the grid?
-                    //Was it left, middle, or right?
-                    if (xPosition < -267)
-                        sectionPositionX = -800;
-                    else if (xPosition < 267)
-                        sectionPositionX = -267;
-                    else
-                        sectionPositionX = 267;
+            //Was it left, middle, or right?
+            if (xPosition < -267)
+                sectionPositionX = -800;
+            else if (xPosition < 267)
+                sectionPositionX = -267;
+            else
+                sectionPositionX = 267;
 
-                    //Was it bottom, middle, or top?
-                    if (yPosition < -167)
-                        sectionPositionY = -500;
-                    else if (yPosition < 0.167)
-                        sectionPositionY = -167;
-                    else
-                        sectionPositionY = 167;
+            //Was it bottom, middle, or top?
+            if (yPosition < -167)
+                sectionPositionY = -500;
+            else if (yPosition < 0.167)
+                sectionPositionY = -167;
+            else
+                sectionPositionY = 167;
+
             return [sectionPositionX, sectionPositionY];
+        }
+
+        /**Given an array of points, makes the shape plotted thicker.
+        * @param {*} verticesArray The array with the shape that is meant to be thicker
+        * @param {*} thicknessLevel The number of pixels to be added to make the shape thicker
+        * @returns verticecsArray An array containing a thicker version of verticesArray
+        */
+        function addThickness(verticesArray, thicknessLevel) {
+
+            //verticesArray = [1, 2, 2, 3, 3, 3, 4, 5, 5, 6];
+            //Thickness level works at 1 but not anything above
+            
+            if (thicknessLevel > 1) {
+                for (i = 0; i < verticesArray.length/2; i = i + 4) {
+                    for (j = 1; j <= thicknessLevel/2; j++) {
+                        //I'm aware there is weird integer stuff doing it this way with thicknessLeve/2, but I am tired.
+                        verticesArray.push(verticesArray[i], verticesArray[i + 1] + j);
+                        verticesArray.push(verticesArray[i], verticesArray[i + 1] - j);
+                    }
+                }
+            }
+            else {
+                for (i = 0; i < verticesArray.length/2; i = i + 2) {
+                    verticesArray.push(verticesArray[i], verticesArray[i + 1] + 1);
+                }
+            }
+            console.log(verticesArray);
+            return verticesArray;
         }
 
 
